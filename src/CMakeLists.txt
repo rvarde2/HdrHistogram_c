@@ -1,4 +1,4 @@
-
+# Check for required libraries
 include(CheckLibraryExists)
 check_library_exists(m ceil "" HAVE_LIBM)
 check_library_exists(rt clock_gettime "" HAVE_LIBRT)
@@ -10,6 +10,15 @@ else()
     set(HDR_LOG_IMPLEMENTATION hdr_histogram_log_no_op.c)
     set(HDR_ZLIB "")
 endif()
+
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(DPDK REQUIRED libdpdk)
+# Retrieve DPDK flags using pkg-config
+execute_process(
+    COMMAND pkg-config --cflags --libs libdpdk
+    OUTPUT_VARIABLE DPDK_FLAGS
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
 
 set(HDR_HISTOGRAM_SOURCES
     hdr_encoding.c
@@ -35,13 +44,12 @@ function(hdr_histogram_add_library NAME LIBRARY_TYPE DO_INSTALL)
 
     target_link_libraries(${NAME}
         PRIVATE
-#            ZLIB::ZLIB
             ${HDR_ZLIB}
-#            $<$<BOOL:${ZLIB_FOUND}>ZLIB::ZLIB>
             Threads::Threads
             $<$<BOOL:${HAVE_LIBM}>:m>
             $<$<BOOL:${HAVE_LIBRT}>:rt>
-            $<$<BOOL:${WIN32}>:ws2_32>)
+            $<$<BOOL:${WIN32}>:ws2_32>
+            ${DPDK_FLAGS}) # Add DPDK flags here
     target_include_directories(
         ${NAME}
         PUBLIC

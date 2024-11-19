@@ -12,8 +12,11 @@
 
 #ifndef HDR_MALLOC_H__
 #define HDR_MALLOC_H__
-#define hdr_malloc malloc
-#define hdr_calloc calloc
-#define hdr_realloc realloc
-#define hdr_free free
+
+#include <rte_malloc.h>
+#define hdr_malloc(MEM_SIZE) rte_malloc(NULL,MEM_SIZE,64)
+#define hdr_calloc(N,TYPE_SIZE) rte_calloc(NULL, N, TYPE_SIZE, 64)
+#define hdr_realloc(PTR,NEW_SIZE) rte_realloc(PTR,NEW_SIZE,64)
+#define hdr_free(VAR) rte_free(VAR)
+
 #endif
