@@ -16,7 +16,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-
+#include <rte_eal.h>
 #include <hdr/hdr_histogram.h>
 #include <hdr/hdr_histogram_log.h>
 #include <hdr/hdr_interval_recorder.h>
@@ -126,6 +126,12 @@ int main(int argc, char** argv)
     struct hdr_histogram* inactive = NULL;
     pthread_t recording_thread;
     FILE* output = stdout;
+    
+    // Initialize EAL
+    if (rte_eal_init(argc, argv) < 0) {
+        printf("EAL initialization failed\n");
+        return 1;
+    }
 
     memset(&config, 0, sizeof(struct config_t));
     if (!handle_opts(argc, argv, &config))
@@ -181,6 +187,6 @@ int main(int argc, char** argv)
         fflush(output);
     }
 #pragma clang diagnostic pop
-
+    rte_eal_cleanup();
     pthread_exit(NULL);
 }

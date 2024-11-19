@@ -10,7 +10,7 @@
 #include <time.h>
 #include <errno.h>
 #include <string.h>
-
+#include <rte_eal.h>
 #include <hdr/hdr_histogram.h>
 #include <hdr/hdr_histogram_log.h>
 
@@ -26,7 +26,11 @@ int main(int argc, char** argv)
     struct hdr_log_reader reader;
     struct hdr_histogram* h = NULL;
     hdr_timespec timestamp, interval;
-
+    // Initialize EAL
+    if (rte_eal_init(argc, argv) < 0) {
+        printf("EAL initialization failed\n");
+        return 1;
+    }
     if (argc == 1)
     {
         f = stdin;
@@ -73,7 +77,7 @@ int main(int argc, char** argv)
             return -1;
         }
     }
-
+    rte_eal_cleanup();
     return 0;
 }
 
