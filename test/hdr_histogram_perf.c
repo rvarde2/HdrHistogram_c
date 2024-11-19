@@ -11,7 +11,7 @@
 #include <hdr/hdr_histogram.h>
 #include <hdr/hdr_time.h>
 #include <string.h>
-
+#include <rte_eal.h>
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
 
@@ -62,7 +62,7 @@ static char *format_double(double d)
     return buffer;
 }
 
-int main(void)
+int main(int argc, char **argv)
 {
     struct hdr_histogram* histogram;
     hdr_timespec t0, t1;
@@ -70,7 +70,13 @@ int main(void)
     int64_t iterations;
     int64_t max_value = INT64_C(24) * 60 * 60 * 1000000;
     int64_t min_value = 1;
-
+    
+    // Initialize EAL
+    if (rte_eal_init(argc, argv) < 0) {
+        printf("EAL initialization failed\n");
+        return 1;
+    }
+    
     result = hdr_init(min_value, max_value, 4, &histogram);
     if (result != 0)
     {
@@ -99,6 +105,8 @@ int main(void)
 
         printf("%s - %d, ops/sec: %s\n", "Iteration", i + 1, format_double(ops_sec));
     }
-
+    
+    rte_eal_cleanup();
+    
     return 0;
 }

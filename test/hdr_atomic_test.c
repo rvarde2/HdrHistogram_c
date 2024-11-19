@@ -8,7 +8,7 @@
 
 #include <stdio.h>
 #include <hdr_atomic.h>
-
+#include <rte_eal.h>
 #include "minunit.h"
 
 int tests_run = 0;
@@ -98,7 +98,13 @@ static int hdr_atomic_run_tests(void)
     return result.message == NULL ? 0 : -1;
 }
 
-int main(void)
+int main(int argc, char **argv)
 {
-    return hdr_atomic_run_tests();
+    if (rte_eal_init(argc, argv) < 0) {
+            printf("EAL initialization failed\n");
+                return 1;
+    }
+    int testStatus = hdr_atomic_run_tests();
+    rte_eal_cleanup();
+    return testStatus;
 }

@@ -19,6 +19,7 @@
 #include <hdr/hdr_histogram_log.h>
 #include "hdr_encoding.h"
 #include "minunit.h"
+#include <rte_eal.h>
 
 #if defined(_MSC_VER)
 #pragma warning(push)
@@ -1019,9 +1020,15 @@ static int hdr_histogram_log_run_tests(void)
     return result.message == NULL ? 0 : -1;
 }
 
-int main(void)
+int main(int argc, char **argv)
 {
-    return hdr_histogram_log_run_tests();
+    if (rte_eal_init(argc, argv) < 0) {
+            printf("EAL initialization failed\n");
+                return 1;
+    }
+    int testStatus = hdr_histogram_log_run_tests();
+    rte_eal_cleanup();
+    return testStatus;
 }
 
 #if defined(_MSC_VER)

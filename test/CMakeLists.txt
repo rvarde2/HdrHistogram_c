@@ -17,6 +17,16 @@ if(HDR_HISTOGRAM_BUILD_BENCHMARK)
         set(GOOGLE_BENCHMARK_SOURCE_DIR ${SOURCE_DIR})
         ExternalProject_Get_Property(google_benchmark BINARY_DIR)
         set(GOOGLE_BENCHMARK_BINARY_DIR ${BINARY_DIR})
+        
+        find_package(PkgConfig REQUIRED)
+        pkg_check_modules(DPDK REQUIRED libdpdk)
+
+        # Retrieve DPDK flags using pkg-config
+        execute_process(
+            COMMAND pkg-config --cflags --libs libdpdk
+            OUTPUT_VARIABLE DPDK_FLAGS
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
 
         add_executable(hdr_histogram_benchmark
             hdr_histogram_benchmark.cpp)
@@ -31,7 +41,8 @@ if(HDR_HISTOGRAM_BUILD_BENCHMARK)
         target_link_libraries(hdr_histogram_benchmark
             PRIVATE
                 benchmark
-                hdr_histogram_static)
+                hdr_histogram_static
+                ${DPDK_FLAGS})
         install(
             TARGETS hdr_histogram_benchmark
             DESTINATION ${CMAKE_INSTALL_BINDIR})
@@ -41,6 +52,15 @@ if(HDR_HISTOGRAM_BUILD_BENCHMARK)
 endif()
 
 function(hdr_histogram_add_test_executable NAME)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(DPDK REQUIRED libdpdk)
+
+    # Retrieve DPDK flags using pkg-config
+    execute_process(
+        COMMAND pkg-config --cflags --libs libdpdk
+        OUTPUT_VARIABLE DPDK_FLAGS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
     add_executable(${NAME}
         ${NAME}.c
         hdr_test_util.h
@@ -48,7 +68,8 @@ function(hdr_histogram_add_test_executable NAME)
         minunit.h)
     target_link_libraries(${NAME}
         PRIVATE
-            hdr_histogram_static)
+            hdr_histogram_static
+            ${DPDK_FLAGS})
     target_include_directories(${NAME}
         PRIVATE
             ${PROJECT_SOURCE_DIR}/src)

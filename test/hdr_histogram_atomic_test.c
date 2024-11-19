@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <hdr/hdr_histogram.h>
 #include <hdr/hdr_interval_recorder.h>
-
+#include <rte_eal.h>
 #include "minunit.h"
 #include "hdr_test_util.h"
 
@@ -561,7 +561,13 @@ static int hdr_histogram_run_tests(void)
     return result.message == NULL ? 0 : -1;
 }
 
-int main(void)
+int main(int argc, char **argv)
 {
-    return hdr_histogram_run_tests();
+    if (rte_eal_init(argc, argv) < 0) {
+            printf("EAL initialization failed\n");
+                return 1;
+    }
+    int testStatus = hdr_histogram_run_tests();
+    rte_eal_cleanup();
+    return testStatus;
 }
