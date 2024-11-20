@@ -1002,11 +1002,11 @@ int hdr_log_read(
     {
         if (NULL != timestamp)
         {
-            memcpy(timestamp, &log_entry.start_timestamp, sizeof(*timestamp));
+            hdr_memcpy(timestamp, &log_entry.start_timestamp, sizeof(*timestamp));
         }
         if (NULL != interval)
         {
-            memcpy(interval, &log_entry.interval, sizeof(*interval));
+            hdr_memcpy(interval, &log_entry.interval, sizeof(*interval));
         }
     }
 

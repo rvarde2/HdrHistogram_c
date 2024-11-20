@@ -42,6 +42,10 @@ function(hdr_histogram_add_library NAME LIBRARY_TYPE DO_INSTALL)
         ${HDR_HISTOGRAM_PRIVATE_HEADERS}
         ${HDR_HISTOGRAM_PUBLIC_HEADERS})
 
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
+        target_compile_options(${NAME} PRIVATE -mssse3)
+    endif()
+
     target_link_libraries(${NAME}
         PRIVATE
             ${HDR_ZLIB}
